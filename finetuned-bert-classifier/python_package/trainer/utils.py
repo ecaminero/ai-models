@@ -97,6 +97,4 @@ def save_model(args):
         print(f"Saved model files in gs://{bucket_name}/{model_path}")
     else:
         print(f"Saved model files at {os.path.join('/tmp', args.model_name)}")
-        print(
-            f"To save model files in GCS bucket, please specify job_dir starting with gs://"
-        )
+        print(f"To save model files in GCS bucket, please specify job_dir starting with gs://")

@@ -31,7 +31,7 @@ then
 fi
 
 # JOB_NAME: the name of your job running on AI Platform.
-JOB_PREFIX="finetuned-bert-classifier-pytorch-cstm-cntr"
+JOB_PREFIX="bert-classifier-pytorch-cstm-cntr"
 JOB_NAME=${JOB_PREFIX}-$(date +%Y%m%d%H%M%S)-custom-job
 
 # REGION: select a region from https://cloud.google.com/vertex-ai/docs/general/locations#available_regions
@@ -66,7 +66,7 @@ gcloud beta ai custom-jobs create \
     --display-name=${JOB_NAME} \
     --region ${REGION} \
     --worker-pool-spec="${worker_pool_spec}" \
-    --args="--model-name","finetuned-bert-classifier","--job-dir",$JOB_DIR
+    --args="--model-name","bert-classifier","--job-dir",$JOB_DIR
 
 echo "After the job is completed successfully, model files will be saved at $JOB_DIR/"
 

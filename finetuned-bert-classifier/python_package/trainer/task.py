@@ -73,7 +73,7 @@ def get_args():
     )
     args_parser.add_argument(
         "--model-name",
-        default="finetuned-bert-classifier",
+        default="bert-classifier",
         help="The name of your saved model",
     )
 

@@ -21,7 +21,7 @@ TASK_TYPE = "classification"
 DATASET_NAME = "imdb"
 
 # pre-trained model name
-PRETRAINED_MODEL_NAME = "bert-base-cased"
+PRETRAINED_MODEL_NAME = "bert-base-uncased"
 
 # List of the class values (labels) in a classification dataset.
 TARGET_LABELS = {1: 1, 0: 0, -1: 0}

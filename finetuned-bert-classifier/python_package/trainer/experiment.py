@@ -15,17 +15,21 @@
 import os
 import numpy as np
 import hypertune
+import torch
+import torch.optim as optim
 
 from transformers import (
-    AutoTokenizer,
     EvalPrediction,
     Trainer,
     TrainingArguments,
     default_data_collator,
     TrainerCallback,
+    BertTokenizer 
 )
-
 from trainer import model, metadata, utils
+from transformers import logging
+
+logging.set_verbosity_error()
 
 
 class HPTuneCallback(TrainerCallback):
@@ -41,9 +45,7 @@ class HPTuneCallback(TrainerCallback):
         self.hpt = hypertune.HyperTune()
 
     def on_evaluate(self, args, state, control, **kwargs):
-        print(
-            f"HP metric {self.metric_tag}={kwargs['metrics'][self.metric_value]}"
-        )
+        print(f"HP metric {self.metric_tag}={kwargs['metrics'][self.metric_value]}")
         self.hpt.report_hyperparameter_tuning_metric(
             hyperparameter_metric_tag=self.metric_tag,
             metric_value=kwargs["metrics"][self.metric_value],
@@ -72,9 +74,8 @@ def train(args, model, train_dataset, test_dataset):
     """
 
     # initialize the tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(
+    tokenizer = BertTokenizer.from_pretrained(
         metadata.PRETRAINED_MODEL_NAME,
-        use_fast=True,
     )
 
     # set training arguments
@@ -87,6 +88,9 @@ def train(args, model, train_dataset, test_dataset):
         weight_decay=args.weight_decay,
         output_dir=os.path.join("/tmp", args.model_name),
     )
+    
+    # Define the optimizer.
+    optimizer = optim.Adam(model.parameters(), lr=1e-5)
 
     # initialize our Trainer
     trainer = Trainer(
@@ -98,6 +102,8 @@ def train(args, model, train_dataset, test_dataset):
         tokenizer=tokenizer,
         compute_metrics=compute_metrics,
     )
+
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     # add hyperparameter tuning callback to report metrics when enabled
     if args.hp_tune == "y":
@@ -115,6 +121,7 @@ def run(args):
     Args:
       args: experiment parameters.
     """
+
     # Open our dataset
     train_dataset, test_dataset = utils.load_data(args)
 
@@ -129,7 +136,6 @@ def run(args):
 
     metrics = trainer.evaluate(eval_dataset=test_dataset)
     trainer.save_metrics("all", metrics)
-
     # Export the trained model
     trainer.save_model(os.path.join("/tmp", args.model_name))
 
@@ -138,6 +144,4 @@ def run(args):
         utils.save_model(args)
     else:
         print(f"Saved model files at {os.path.join('/tmp', args.model_name)}")
-        print(
-            f"To save model files in GCS bucket, please specify job_dir starting with gs://"
-        )
+        print(f"To save model files in GCS bucket, please specify job_dir starting with gs://")

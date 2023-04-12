@@ -23,7 +23,7 @@ USER model-server
 RUN python3 -m pip install --upgrade pip
 RUN pip3 install transformers
 
-ARG MODEL_NAME=finetuned-bert-classifier
+ARG MODEL_NAME=bert-classifier
 ENV MODEL_NAME="${MODEL_NAME}"
 
 # health and prediction listener ports

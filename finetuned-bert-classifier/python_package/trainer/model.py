@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from transformers import AutoModelForSequenceClassification
+from transformers import BertForSequenceClassification
 from trainer import metadata
+import torch
 
 
 def create(num_labels):
@@ -22,9 +23,14 @@ def create(num_labels):
     Args:
       num_labels: number of target labels
     """
+    # Ensure CUDA is enabled
+    print(torch.cuda.is_available())
     # Create the model, loss function, and optimizer
-    model = AutoModelForSequenceClassification.from_pretrained(
-        metadata.PRETRAINED_MODEL_NAME, num_labels=num_labels
+    model = BertForSequenceClassification.from_pretrained(
+        metadata.PRETRAINED_MODEL_NAME,
+        num_labels=num_labels,  # for binary classification
+        output_attentions=False,
+        output_hidden_states=False
     )
 
     return model
