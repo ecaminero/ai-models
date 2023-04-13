@@ -29,7 +29,7 @@ from transformers import (
 from trainer import model, metadata, utils
 from transformers import logging
 
-logging.set_verbosity_error()
+
 
 
 class HPTuneCallback(TrainerCallback):
@@ -86,12 +86,14 @@ def train(args, model, train_dataset, test_dataset):
         per_device_eval_batch_size=args.batch_size,
         num_train_epochs=args.num_epochs,
         weight_decay=args.weight_decay,
+        log_level="debug",
+        logging_first_step=True,
         output_dir=os.path.join("/tmp", args.model_name),
     )
     
     # Define the optimizer.
     optimizer = optim.Adam(model.parameters(), lr=1e-5)
-
+    optimizer.zero_grad()
     # initialize our Trainer
     trainer = Trainer(
         model,
